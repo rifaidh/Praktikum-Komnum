@@ -1,0 +1,36 @@
+import numpy as np
+
+# Fungsi yang ingin diintegrasikan
+def f(x):
+    return np.sin(x)  # Contoh: integral dari sin(x)
+
+# Metode Trapezoidal biasa
+def trapezoidal(f, a, b, n):
+    h = (b - a) / n
+    result = 0.5 * (f(a) + f(b))
+    for i in range(1, n):
+        result += f(a + i * h)
+    return result * h
+
+# Metode Romberg
+def romberg_integration(f, a, b, max_order):
+    R = np.zeros((max_order, max_order))
+    for i in range(0, max_order):
+        n = 2 ** i
+        R[i, 0] = trapezoidal(f, a, b, n)
+        for k in range(1, i + 1):
+            R[i, k] = (4*k * R[i, k-1] - R[i-1, k-1]) / (4*k - 1)
+    
+    return R
+
+# Contoh penggunaan
+a = 0
+b = np.pi
+max_order = 5
+
+romberg_table = romberg_integration(f, a, b, max_order)
+
+# Cetak tabel Romberg
+print("Tabel Romberg:")
+for row in romberg_table:
+    print(["{:.10f}".format(val) if val != 0 else " " for val in row])
