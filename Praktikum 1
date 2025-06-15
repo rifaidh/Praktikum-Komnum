@@ -1,0 +1,60 @@
+import math
+import matplotlib.pyplot as plt
+
+# Contoh fungsi
+def f(x):
+    return math.exp(-x) - x
+
+# Iterasi
+def regula_falsi(f, x1, x2, tol=1e-6, max_iter=100):
+    print(f"{'Iter':<5} {'x1':<10} {'x2':<10} {'x3':<12} {'f(x3)':<12} {'Error (%)':<10}")
+    print("-" * 60)
+    
+    for i in range(1, max_iter + 1):
+        f1 = f(x1)
+        f2 = f(x2)
+        
+        # Rumus Regula Falsi
+        x3 = x2 - (f2 * (x1 - x2)) / (f1 - f2)
+        f3 = f(x3)
+        
+        if f1 * f3 < 0:
+            x2 = x3
+        else:
+            x1 = x3
+        
+        # Error relatif
+        if i == 1:
+            err = float('inf')
+        else:
+            err = abs((x3 - prev_x3) / x3) * 100
+
+        print(f"{i:<5} {x1:<10.6f} {x2:<10.6f} {x3:<12.6f} {f3:<12.6f} {err if i>1 else '-':<10}")
+        
+        if err < tol:
+            break
+        prev_x3 = x3
+    return x3
+
+# Plot fungsi f(x)
+def plot_function(f, a, b, root=None):
+    import numpy as np
+    x = np.linspace(a, b, 400)
+    y = [f(xi) for xi in x]
+    
+    plt.axhline(0, color='black', linewidth=0.5)
+    plt.plot(x, y, label='f(x) = e^(-x) - x', color='blue')
+    if root is not None:
+        plt.plot(root, f(root), 'ro', label=f"Akar mendekati x = {root:.6f}")
+    plt.xlabel('x')
+    plt.ylabel('f(x)')
+    plt.title('Grafik Fungsi dan Akar dengan Regula Falsi')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+# Eksekusi program
+x1 = 0
+x2 = 1
+akar = regula_falsi(f, x1, x2, tol=1e-6, max_iter=20)
+plot_function(f, -0.5, 1.5, root=akar)
